@@ -28,30 +28,34 @@ def index():
 
 # CREATE: Rota para doação de livros
 @app.route("/livros", methods=["POST"])
-def criar_livro():
+def criar_livros():
     dados = request.get_json()
 
-    # Verifica se todos os campos necessários estão presentes
+    # Verifica se a requisição tem uma lista de livros
+    if not isinstance(dados, list):
+        return jsonify({"erro": "A requisição deve ser uma lista de livros"}), 400
+
+    # Verifica se cada livro tem os campos obrigatórios
     campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
-    if not all(campo in dados for campo in campos_obrigatorios):
-        return jsonify({"erro": "Todos os campos são obrigatórios"}), 400
+    for livro in dados:
+        if not all(campo in livro for campo in campos_obrigatorios):
+            return jsonify({"erro": "Todos os campos são obrigatórios"}), 400
 
     try:
         with sqlite3.connect("database.db") as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                """
-                INSERT INTO LIVROS (titulo, categoria, autor, image_url) 
-                VALUES (?, ?, ?, ?)
-                """,
-                (dados["titulo"], dados["categoria"], dados["autor"], dados["image_url"])
-            )
+            for livro in dados:
+                cursor.execute(
+                    """
+                    INSERT INTO LIVROS (titulo, categoria, autor, image_url) 
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (livro["titulo"], livro["categoria"], livro["autor"], livro["image_url"])
+                )
             conn.commit()
-        return jsonify({"mensagem": "Livro cadastrado com sucesso"}), 201
-    except sqlite3.IntegrityError:
-        return jsonify({"erro": "Erro de integridade no banco de dados"}), 409
+        return jsonify({"mensagem": "Livros cadastrados com sucesso"}), 201
     except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro interno no banco de dados: {str(e)}"}), 500
+        return jsonify({"erro": f"Erro ao inserir no banco de dados: {str(e)}"}), 500
 
 # READ: Rota para listar todos os livros
 @app.route("/livros", methods=["GET"])
