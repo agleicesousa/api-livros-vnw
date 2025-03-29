@@ -48,8 +48,10 @@ def criar_livro():
             )
             conn.commit()
         return jsonify({"mensagem": "Livro cadastrado com sucesso"}), 201
+    except sqlite3.IntegrityError:
+        return jsonify({"erro": "Erro de integridade no banco de dados"}), 409
     except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao inserir no banco de dados: {str(e)}"}), 500
+        return jsonify({"erro": f"Erro interno no banco de dados: {str(e)}"}), 500
 
 # READ: Rota para listar todos os livros
 @app.route("/livros", methods=["GET"])
@@ -72,7 +74,7 @@ def listar_livros():
             ]
             return jsonify(livros_formatados), 200
     except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao buscar livros: {str(e)}"}), 500
+        return jsonify({"erro": f"Erro ao buscar livros no banco de dados: {str(e)}"}), 500
 
 # READ: Rota para buscar um livro por ID
 @app.route("/livros/<int:id>", methods=["GET"])
@@ -95,7 +97,7 @@ def buscar_livro(id):
             else:
                 return jsonify({"erro": "Livro não encontrado"}), 404
     except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao buscar livro: {str(e)}"}), 500
+        return jsonify({"erro": f"Erro ao buscar livro no banco de dados: {str(e)}"}), 500
 
 # Rota para buscar livros pelo título, categoria ou autor
 @app.route("/livros/buscar", methods=["GET"])
@@ -132,7 +134,7 @@ def buscar_livro_por_titulo():
             else:
                 return jsonify({"mensagem": "Nenhum livro encontrado"}), 404
     except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao buscar livros: {str(e)}"}), 500
+        return jsonify({"erro": f"Erro ao buscar livros no banco de dados: {str(e)}"}), 500
 
 # UPDATE: Rota para atualizar um livro por ID
 @app.route("/livros/<int:id>", methods=["PUT"])
@@ -161,7 +163,7 @@ def atualizar_livro(id):
             else:
                 return jsonify({"erro": "Livro não encontrado"}), 404
     except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao atualizar livro: {str(e)}"}), 500
+        return jsonify({"erro": f"Erro ao atualizar livro no banco de dados: {str(e)}"}), 500
 
 # DELETE: Rota para deletar um livro por ID
 @app.route("/livros/<int:id>", methods=["DELETE"])
@@ -177,7 +179,7 @@ def deletar_livro(id):
             else:
                 return jsonify({"erro": "Livro não encontrado"}), 404
     except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao deletar livro: {str(e)}"}), 500
+        return jsonify({"erro": f"Erro ao deletar livro no banco de dados: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
