@@ -97,7 +97,7 @@ def buscar_livro(id):
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao buscar livro: {str(e)}"}), 500
 
-# Rota para buscar livros pelo título ou palavra-chave
+# Rota para buscar livros pelo título, categoria ou autor
 @app.route("/livros/buscar", methods=["GET"])
 def buscar_livro_por_titulo():
     palavra_chave = request.args.get("q", "")
@@ -110,9 +110,10 @@ def buscar_livro_por_titulo():
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT * FROM LIVROS WHERE titulo LIKE ?
+                SELECT * FROM LIVROS 
+                WHERE titulo LIKE ? OR categoria LIKE ? OR autor LIKE ?
                 """,
-                (f"%{palavra_chave}%",)
+                (f"%{palavra_chave}%", f"%{palavra_chave}%", f"%{palavra_chave}%")
             )
             livros = cursor.fetchall()
 
