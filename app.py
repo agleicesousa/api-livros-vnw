@@ -21,25 +21,20 @@ def init_db():
 # Inicializa o banco de dados ao iniciar a aplicação
 init_db()
 
-# Rota para a página inicial
+# Página inicial
 @app.route("/")
 def index():
     return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
 
-# Rota para doação de livros
-@app.route("/doar", methods=["POST"])
-def doar():
+# CREATE: Rota para doação de livros
+@app.route("/livros", methods=["POST"])
+def criar_livro():
     dados = request.get_json()
 
     # Verifica se todos os campos necessários estão presentes
     campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
     if not all(campo in dados for campo in campos_obrigatorios):
         return jsonify({"erro": "Todos os campos são obrigatórios"}), 400
-
-    titulo = dados["titulo"]
-    categoria = dados["categoria"]
-    autor = dados["autor"]
-    image_url = dados["image_url"]
 
     try:
         with sqlite3.connect("database.db") as conn:
@@ -49,15 +44,14 @@ def doar():
                 INSERT INTO LIVROS (titulo, categoria, autor, image_url) 
                 VALUES (?, ?, ?, ?)
                 """,
-                (titulo, categoria, autor, image_url)
+                (dados["titulo"], dados["categoria"], dados["autor"], dados["image_url"])
             )
             conn.commit()
+        return jsonify({"mensagem": "Livro cadastrado com sucesso"}), 201
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao inserir no banco de dados: {str(e)}"}), 500
 
-    return jsonify({"mensagem": "Livro cadastrado com sucesso"}), 201
-
-# Rota para listar todos os livros
+# READ: Rota para listar todos os livros
 @app.route("/livros", methods=["GET"])
 def listar_livros():
     try:
@@ -66,7 +60,6 @@ def listar_livros():
             cursor.execute("SELECT * FROM LIVROS")
             livros = cursor.fetchall()
 
-            # Transforma os resultados em uma lista de dicionários
             livros_formatados = [
                 {
                     "id": livro[0],
@@ -77,12 +70,11 @@ def listar_livros():
                 }
                 for livro in livros
             ]
-
             return jsonify(livros_formatados), 200
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao buscar livros: {str(e)}"}), 500
 
-# Rota para buscar um livro por ID
+# READ: Rota para buscar um livro por ID
 @app.route("/livros/<int:id>", methods=["GET"])
 def buscar_livro(id):
     try:
@@ -105,7 +97,36 @@ def buscar_livro(id):
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao buscar livro: {str(e)}"}), 500
 
-# Rota para deletar um livro por ID
+# UPDATE: Rota para atualizar um livro por ID
+@app.route("/livros/<int:id>", methods=["PUT"])
+def atualizar_livro(id):
+    dados = request.get_json()
+
+    campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
+    if not all(campo in dados for campo in campos_obrigatorios):
+        return jsonify({"erro": "Todos os campos são obrigatórios"}), 400
+
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                UPDATE LIVROS
+                SET titulo = ?, categoria = ?, autor = ?, image_url = ?
+                WHERE id = ?
+                """,
+                (dados["titulo"], dados["categoria"], dados["autor"], dados["image_url"], id)
+            )
+            conn.commit()
+
+            if cursor.rowcount > 0:
+                return jsonify({"mensagem": "Livro atualizado com sucesso"}), 200
+            else:
+                return jsonify({"erro": "Livro não encontrado"}), 404
+    except sqlite3.Error as e:
+        return jsonify({"erro": f"Erro ao atualizar livro: {str(e)}"}), 500
+
+# DELETE: Rota para deletar um livro por ID
 @app.route("/livros/<int:id>", methods=["DELETE"])
 def deletar_livro(id):
     try:
