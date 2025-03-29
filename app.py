@@ -97,6 +97,42 @@ def buscar_livro(id):
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao buscar livro: {str(e)}"}), 500
 
+# Rota para buscar livros pelo título ou palavra-chave
+@app.route("/livros/buscar", methods=["GET"])
+def buscar_livro_por_titulo():
+    palavra_chave = request.args.get("q", "")
+
+    if not palavra_chave:
+        return jsonify({"erro": "É necessário fornecer uma palavra-chave para a busca"}), 400
+
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM LIVROS WHERE titulo LIKE ?
+                """,
+                (f"%{palavra_chave}%",)
+            )
+            livros = cursor.fetchall()
+
+            if livros:
+                livros_formatados = [
+                    {
+                        "id": livro[0],
+                        "titulo": livro[1],
+                        "categoria": livro[2],
+                        "autor": livro[3],
+                        "image_url": livro[4]
+                    }
+                    for livro in livros
+                ]
+                return jsonify(livros_formatados), 200
+            else:
+                return jsonify({"mensagem": "Nenhum livro encontrado"}), 404
+    except sqlite3.Error as e:
+        return jsonify({"erro": f"Erro ao buscar livros: {str(e)}"}), 500
+
 # UPDATE: Rota para atualizar um livro por ID
 @app.route("/livros/<int:id>", methods=["PUT"])
 def atualizar_livro(id):
