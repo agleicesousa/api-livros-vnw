@@ -40,40 +40,40 @@ def after_request(response):
 def index():
     return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
 
-# CREATE: Rota para doação de livros
 @app.route("/livros", methods=["POST"])
 def criar_livros():
-    dados = request.get_json()
-
-    # Verifica se foram enviados dados
-    if not dados:
-        return jsonify({"erro": "Nenhum dado enviado"}), 400
-
-    # Converte para lista se for um único livro
-    if not isinstance(dados, list):
-        dados = [dados]
-
-    # Verifica se cada livro tem os campos obrigatórios
-    campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
-    for livro in dados:
-        if not all(campo in livro for campo in campos_obrigatorios):
-            return jsonify({"erro": "Todos os campos são obrigatórios"}), 400
-
     try:
+        dados = request.get_json()
+
+        # Validação dos dados
+        if not dados:
+            return jsonify({"erro": "Nenhum dado enviado"}), 400
+
+        # Converte para lista se for um único livro
+        livros = [dados] if not isinstance(dados, list) else dados
+
+        # Campos obrigatórios
+        campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
+        for livro in livros:
+            if not all(campo in livro for campo in campos_obrigatorios):
+                return jsonify({"erro": f"Faltam campos obrigatórios: {campos_obrigatorios}"}), 400
+
+        # Insere no banco de dados (SQLite exemplo)
         with sqlite3.connect("database.db") as conn:
             cursor = conn.cursor()
-            for livro in dados:
+            for livro in livros:
                 cursor.execute(
-                    """
-                    INSERT INTO LIVROS (titulo, categoria, autor, image_url) 
-                    VALUES (?, ?, ?, ?)
-                    """,
+                    "INSERT INTO LIVROS (titulo, categoria, autor, image_url) VALUES (?, ?, ?, ?)",
                     (livro["titulo"], livro["categoria"], livro["autor"], livro["image_url"])
                 )
             conn.commit()
-        return jsonify({"mensagem": "Livro(s) cadastrado(s) com sucesso"}), 201
-    except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao inserir no banco de dados: {str(e)}"}), 500
+
+        return jsonify({
+            "mensagem": f"{len(livros)} livro(s) cadastrado(s) com sucesso",
+        }), 201
+
+    except Exception as e:
+        return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
 
 # READ: Rota para listar todos os livros
 @app.route("/livros", methods=["GET"])
