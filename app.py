@@ -27,11 +27,6 @@ def init_db():
 # Inicializa o banco de dados ao iniciar a aplicação
 init_db()
 
-# Página inicial
-@app.route("/")
-def index():
-    return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
-
 # Configuração de CORS para permitir requisições do frontend
 @app.after_request
 def after_request(response):
@@ -39,6 +34,11 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE')
     return response
+
+# Página inicial
+@app.route("/")
+def index():
+    return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
 
 # CREATE: Rota para doação de livros
 @app.route("/livros", methods=["POST"])
