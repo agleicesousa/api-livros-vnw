@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 load_dotenv()
-frontend_origin = os.getenv("FRONTEND_ORIGIN")
+frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
 CORS(app, resources={r"/livros/*": {"origins": frontend_origin}})
 
 # Função para inicializar o banco de dados
@@ -31,6 +31,14 @@ init_db()
 @app.route("/")
 def index():
     return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
+
+# Configuração de CORS para permitir requisições do frontend
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', frontend_origin)
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE')
+    return response
 
 # CREATE: Rota para doação de livros
 @app.route("/livros", methods=["POST"])
