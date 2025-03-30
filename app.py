@@ -1,7 +1,13 @@
 import sqlite3
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+load_dotenv()
+frontend_origin = os.getenv("FRONTEND_ORIGIN")
+CORS(app, resources={r"/livros/*": {"origins": frontend_origin}})
 
 # Função para inicializar o banco de dados
 def init_db():
