@@ -37,9 +37,13 @@ def index():
 def criar_livros():
     dados = request.get_json()
 
-    # Verifica se a requisição tem uma lista de livros
+    # Verifica se foram enviados dados
+    if not dados:
+        return jsonify({"erro": "Nenhum dado enviado"}), 400
+
+    # Converte para lista se for um único livro
     if not isinstance(dados, list):
-        return jsonify({"erro": "A requisição deve ser uma lista de livros"}), 400
+        dados = [dados]
 
     # Verifica se cada livro tem os campos obrigatórios
     campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
@@ -59,7 +63,7 @@ def criar_livros():
                     (livro["titulo"], livro["categoria"], livro["autor"], livro["image_url"])
                 )
             conn.commit()
-        return jsonify({"mensagem": "Livros cadastrados com sucesso"}), 201
+        return jsonify({"mensagem": "Livro(s) cadastrado(s) com sucesso"}), 201
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao inserir no banco de dados: {str(e)}"}), 500
 
