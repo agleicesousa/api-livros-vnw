@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 load_dotenv()
-frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+frontend_origin = os.getenv("FRONTEND_ORIGIN")
 CORS(app, resources={r"/livros/*": {"origins": frontend_origin}})
 
 # Função para inicializar o banco de dados
