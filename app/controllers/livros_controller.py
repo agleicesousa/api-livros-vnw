@@ -34,3 +34,25 @@ def criar_livros():
 
     except Exception as e:
         return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
+    
+
+def listar_livros():
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM LIVROS")
+            livros = cursor.fetchall()
+
+            livros_formatados = [
+                {
+                    "id": livro[0],
+                    "titulo": livro[1],
+                    "categoria": livro[2],
+                    "autor": livro[3],
+                    "image_url": livro[4]
+                }
+                for livro in livros
+            ]
+            return jsonify(livros_formatados), 200
+    except sqlite3.Error as e:
+        return jsonify({"erro": f"Erro ao buscar livros no banco de dados: {str(e)}"}), 500
