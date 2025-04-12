@@ -78,4 +78,39 @@ def buscar_livro(id):
                 return jsonify({"erro": "Livro não encontrado"}), 404
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao buscar livro no banco de dados: {str(e)}"}), 500
-    
+
+
+def buscar_livro_por_titulo():
+    palavra_chave = request.args.get("q", "")
+
+    if not palavra_chave:
+        return jsonify({"erro": "É necessário fornecer uma palavra-chave para a busca"}), 400
+
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM LIVROS 
+                WHERE titulo LIKE ? OR categoria LIKE ? OR autor LIKE ?
+                """,
+                (f"%{palavra_chave}%", f"%{palavra_chave}%", f"%{palavra_chave}%")
+            )
+            livros = cursor.fetchall()
+
+            if livros:
+                livros_formatados = [
+                    {
+                        "id": livro[0],
+                        "titulo": livro[1],
+                        "categoria": livro[2],
+                        "autor": livro[3],
+                        "image_url": livro[4]
+                    }
+                    for livro in livros
+                ]
+                return jsonify(livros_formatados), 200
+            else:
+                return jsonify({"mensagem": "Nenhum livro encontrado"}), 404
+    except sqlite3.Error as e:
+        return jsonify({"erro": f"Erro ao buscar livros no banco de dados: {str(e)}"}), 500
