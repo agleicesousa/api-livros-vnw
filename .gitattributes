@@ -1,0 +1,22 @@
+# Normalize all text files to LF
+* text=auto eol=lf
+
+# Python scripts
+*.py text eol=lf
+
+# Jinja templates (caso use Flask com HTML)
+*.html text eol=lf
+*.jinja2 text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+
+# SQLite e arquivos binários - não mexe neles!
+*.db binary
+*.sqlite3 binary
+
+# Ignore file permission diffs (útil no Windows)
+*.py diff=python
