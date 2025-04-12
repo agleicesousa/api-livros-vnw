@@ -169,3 +169,18 @@ def atualizar_parcial_livro(id):
                 return jsonify({"erro": "Livro não encontrado"}), 404
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao atualizar livro: {str(e)}"}), 500
+    
+
+def deletar_livro(id):
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM LIVROS WHERE id = ?", (id,))
+            conn.commit()
+
+            if cursor.rowcount > 0:
+                return jsonify({"mensagem": "Livro deletado com sucesso"}), 200
+            else:
+                return jsonify({"erro": "Livro não encontrado"}), 404
+    except sqlite3.Error as e:
+        return jsonify({"erro": f"Erro ao deletar livro no banco de dados: {str(e)}"}), 500

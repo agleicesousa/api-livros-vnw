@@ -41,21 +41,5 @@ def index():
     return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
     
 
-# DELETE: Rota para deletar um livro por ID
-@app.route("/livros/<int:id>", methods=["DELETE"])
-def deletar_livro(id):
-    try:
-        with sqlite3.connect("database.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM LIVROS WHERE id = ?", (id,))
-            conn.commit()
-
-            if cursor.rowcount > 0:
-                return jsonify({"mensagem": "Livro deletado com sucesso"}), 200
-            else:
-                return jsonify({"erro": "Livro não encontrado"}), 404
-    except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao deletar livro no banco de dados: {str(e)}"}), 500
-
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

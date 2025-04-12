@@ -5,7 +5,8 @@ from app.controllers import (
     buscar_livro,
     buscar_livro_por_titulo,
     atualizar_livro,
-    atualizar_parcial_livro
+    atualizar_parcial_livro,
+    deletar_livro
 )
 
 livros_routes = Blueprint('livros', __name__)
@@ -16,3 +17,4 @@ livros_routes.route("/<int:id>", methods=["GET"])(buscar_livro)
 livros_routes.route("/titulo/<string:titulo>", methods=["GET"])(buscar_livro_por_titulo)
 livros_routes.route("/<int:id>", methods=["PATCH"])(atualizar_livro)
 livros_routes.route("/<int:id>", methods=["PUT"])(atualizar_parcial_livro)
+livros_routes.route("/<int:id>", methods=["DELETE"])(deletar_livro)
