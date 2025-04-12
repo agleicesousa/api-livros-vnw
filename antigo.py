@@ -40,8 +40,6 @@ def after_request(response):
 def index():
     return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
 
-# READ: Rota para buscar um livro por ID
-@app.route("/livros/<int:id>", methods=["GET"])
 def buscar_livro(id):
     try:
         with sqlite3.connect("database.db") as conn:

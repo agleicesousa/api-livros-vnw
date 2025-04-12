@@ -56,3 +56,26 @@ def listar_livros():
             return jsonify(livros_formatados), 200
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao buscar livros no banco de dados: {str(e)}"}), 500
+    
+
+def buscar_livro(id):
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM LIVROS WHERE id = ?", (id,))
+            livro = cursor.fetchone()
+
+            if livro:
+                livro_formatado = {
+                    "id": livro[0],
+                    "titulo": livro[1],
+                    "categoria": livro[2],
+                    "autor": livro[3],
+                    "image_url": livro[4]
+                }
+                return jsonify(livro_formatado), 200
+            else:
+                return jsonify({"erro": "Livro não encontrado"}), 404
+    except sqlite3.Error as e:
+        return jsonify({"erro": f"Erro ao buscar livro no banco de dados: {str(e)}"}), 500
+    
