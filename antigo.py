@@ -41,34 +41,6 @@ def index():
     return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
     
 
-# PATCH: Atualizar parcialmente um livro por ID
-@app.route("/livros/<int:id>", methods=["PATCH"])
-def atualizar_parcial_livro(id):
-    dados = request.get_json()
-
-    if not dados:
-        return jsonify({"erro": "Nenhum dado enviado para atualização"}), 400
-
-    try:
-        with sqlite3.connect("database.db") as conn:
-            cursor = conn.cursor()
-
-            # Monta dinamicamente a query apenas com os campos enviados
-            campos_para_atualizar = ", ".join([f"{campo} = ?" for campo in dados.keys()])
-            valores = list(dados.values()) + [id]
-
-            cursor.execute(
-                f"UPDATE LIVROS SET {campos_para_atualizar} WHERE id = ?", valores
-            )
-            conn.commit()
-
-            if cursor.rowcount > 0:
-                return jsonify({"mensagem": "Livro atualizado com sucesso"}), 200
-            else:
-                return jsonify({"erro": "Livro não encontrado"}), 404
-    except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao atualizar livro: {str(e)}"}), 500
-
 # DELETE: Rota para deletar um livro por ID
 @app.route("/livros/<int:id>", methods=["DELETE"])
 def deletar_livro(id):

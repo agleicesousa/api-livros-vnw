@@ -3,5 +3,6 @@ from .livros_controller import (
     listar_livros,
     buscar_livro,
     buscar_livro_por_titulo,
-    atualizar_livro
+    atualizar_livro,
+    atualizar_parcial_livro
 )
