@@ -114,3 +114,31 @@ def buscar_livro_por_titulo():
                 return jsonify({"mensagem": "Nenhum livro encontrado"}), 404
     except sqlite3.Error as e:
         return jsonify({"erro": f"Erro ao buscar livros no banco de dados: {str(e)}"}), 500
+
+
+def atualizar_livro(id):
+    dados = request.get_json()
+
+    campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
+    if not all(campo in dados for campo in campos_obrigatorios):
+        return jsonify({"erro": "Todos os campos são obrigatórios"}), 400
+
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                UPDATE LIVROS
+                SET titulo = ?, categoria = ?, autor = ?, image_url = ?
+                WHERE id = ?
+                """,
+                (dados["titulo"], dados["categoria"], dados["autor"], dados["image_url"], id)
+            )
+            conn.commit()
+
+            if cursor.rowcount > 0:
+                return jsonify({"mensagem": "Livro atualizado com sucesso"}), 200
+            else:
+                return jsonify({"erro": "Livro não encontrado"}), 404
+    except sqlite3.Error as e:
+        return jsonify({"erro": f"Erro ao atualizar livro no banco de dados: {str(e)}"}), 500

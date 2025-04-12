@@ -39,36 +39,6 @@ def after_request(response):
 @app.route("/")
 def index():
     return "<h2>Bem-vindo à API de Doações de Livros!</h2>"
-
-
-# UPDATE: Rota para atualizar um livro por ID
-@app.route("/livros/<int:id>", methods=["PUT"])
-def atualizar_livro(id):
-    dados = request.get_json()
-
-    campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
-    if not all(campo in dados for campo in campos_obrigatorios):
-        return jsonify({"erro": "Todos os campos são obrigatórios"}), 400
-
-    try:
-        with sqlite3.connect("database.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-                UPDATE LIVROS
-                SET titulo = ?, categoria = ?, autor = ?, image_url = ?
-                WHERE id = ?
-                """,
-                (dados["titulo"], dados["categoria"], dados["autor"], dados["image_url"], id)
-            )
-            conn.commit()
-
-            if cursor.rowcount > 0:
-                return jsonify({"mensagem": "Livro atualizado com sucesso"}), 200
-            else:
-                return jsonify({"erro": "Livro não encontrado"}), 404
-    except sqlite3.Error as e:
-        return jsonify({"erro": f"Erro ao atualizar livro no banco de dados: {str(e)}"}), 500
     
 
 # PATCH: Atualizar parcialmente um livro por ID
