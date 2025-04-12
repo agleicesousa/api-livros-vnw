@@ -1,8 +1,10 @@
-# Python specific
+# Python
 *.pyc
 *.pyo
 *.pyd
 __pycache__/
+
+# Virtual Envs
 *.env
 *.venv
 env/
@@ -10,23 +12,44 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.Python
 
-# Flask specific
+# Flask
 instance/
 *.sqlite3
 *.db
 
-# IDEs and editors
+# Environment Files
+.env
+.env.*
+
+# Build / Distribution
+build/
+dist/
+pip-wheel-metadata/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+*.out
+*.err
+
+# IDEs and Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Logs and debug
-*.log
-*.out
-*.err
-
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
+
+# Linter / Type Checker
+.mypy_cache/
+.pylint.d/
