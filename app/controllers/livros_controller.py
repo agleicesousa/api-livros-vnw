@@ -4,16 +4,21 @@ import sqlite3
 def criar_livros():
     try:
         dados = request.get_json()
+
+        # Validação dos dados
         if not dados:
             return jsonify({"erro": "Nenhum dado enviado"}), 400
 
+        # Converte para lista se for um único livro
         livros = [dados] if not isinstance(dados, list) else dados
-        campos = ["titulo", "categoria", "autor", "image_url"]
 
+        # Campos obrigatórios
+        campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
         for livro in livros:
-            if not all(campo in livro for campo in campos):
-                return jsonify({"erro": f"Faltam campos obrigatórios: {campos}"}), 400
+            if not all(campo in livro for campo in campos_obrigatorios):
+                return jsonify({"erro": f"Faltam campos obrigatórios: {campos_obrigatorios}"}), 400
 
+        # Insere no banco de dados (SQLite exemplo)
         with sqlite3.connect("database.db") as conn:
             cursor = conn.cursor()
             for livro in livros:
@@ -23,7 +28,9 @@ def criar_livros():
                 )
             conn.commit()
 
-        return jsonify({"mensagem": f"{len(livros)} livro(s) cadastrado(s) com sucesso"}), 201
+        return jsonify({
+            "mensagem": f"{len(livros)} livro(s) cadastrado(s) com sucesso",
+        }), 201
 
     except Exception as e:
         return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
