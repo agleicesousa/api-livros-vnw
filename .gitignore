@@ -28,6 +28,7 @@ build/
 dist/
 pip-wheel-metadata/
 *.egg-info/
+.venv/
 
 # Testing
 .pytest_cache/
