@@ -91,7 +91,7 @@ Se faltar algo, ela **não passa pano.** Vai devolver um erro 400 com mensagem c
 - [ ] Trocar SQLite por PostgreSQL
 - [ ] Documentação com Swagger/OpenAPI
 - [ ] Autenticação com tokens (JWT ou OAuth)
-- [ ] Integração com frontend em React ou Vue
+- [X] Integração com frontend em React ou Vue
 - [ ] Testes automatizados com Pytest
 
 ---
