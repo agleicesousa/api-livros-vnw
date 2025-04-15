@@ -10,7 +10,7 @@ def create_app():
     app = Flask(__name__)
 
     frontend_origin = os.getenv("FRONTEND_ORIGIN")
-    CORS(app, resources={r"/livros/*": {"origins": frontend_origin}})
+    CORS(app, resources={r"/": {"origins": frontend_origin}})
 
     init_db()
     app.register_blueprint(livros_bp)
