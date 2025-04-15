@@ -8,19 +8,13 @@ from app.routes import livros_bp
 def create_app():
     load_dotenv()
     app = Flask(__name__)
+    app.url_map.strict_slashes = False
 
     frontend_origin = os.getenv("FRONTEND_ORIGIN")
-    CORS(app, resources={r"/": {"origins": frontend_origin}})
+    CORS(app, resources={r"/livros*": {"origins": frontend_origin}})
 
     init_db()
     app.register_blueprint(livros_bp)
-
-    @app.after_request
-    def after_request(response):
-        response.headers.add('Access-Control-Allow-Origin', frontend_origin)
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH')
-        return response
 
     @app.route("/")
     def index():
